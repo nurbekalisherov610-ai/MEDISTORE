@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MEDI STORE</title>
+    <title>Bunker Shop</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
@@ -2392,10 +2392,10 @@
     <div id="splash-screen">
         <div class="logo-container">
             <div class="loading-ring"></div>
-            <img alt="MEDI STORE" class="logo-img-splash">
+            <img alt="Bunker Shop" class="logo-img-splash">
         </div>
         <div class="percentage" id="percentage-text">0%</div>
-        <div class="splash-brand">MEDI STORE</div>
+        <div class="splash-brand">Bunker Shop</div>
     </div>
 
     <!-- ===== MAIN ===== -->
@@ -2403,8 +2403,8 @@
         <div class="top-bar">
             <div class="left-placeholder"></div>
             <div class="logo-area">
-                <div class="mini-logo">M</div>
-                <span class="brand-name">MEDI STORE</span>
+                <div class="mini-logo">B</div>
+                <span class="brand-name">Bunker Shop</span>
             </div>
             <div class="balance-box" onclick="switchTab(3, document.getElementById('nav-wallet'), 'page-wallet')">
                 <span class="balance-text" id="top-balance-text">$0.00</span>
@@ -2420,9 +2420,9 @@
                 <div class="content-container content-container-wide">
                     <div class="home-brand-card">
                         <div class="brand-logo">
-                            <img alt="MEDI STORE">
+                            <img alt="Bunker Shop">
                         </div>
-                        <div class="brand-name-home">MEDI STORE</div>
+                        <div class="brand-name-home">Bunker Shop</div>
                         <div class="brand-sub">Sog'liq uchun professional yechim</div>
                     </div>
 
@@ -2478,7 +2478,7 @@
                         </div>
                     </div>
                     <input type="file" id="avatarFileInput" class="file-input-hidden" accept="image/*" onchange="handleAvatarChange(event)">
-                    <div class="profile-username-large" id="profileUsername">MEDI User</div>
+                    <div class="profile-username-large" id="profileUsername">Bunker User</div>
                     <div class="profile-uid-row">
                         <span class="profile-uid-large" id="profileUid">ID: 10000001</span>
                         <button class="copy-uid-btn" id="copyUidBtn" onclick="copyUid()">
@@ -2882,7 +2882,7 @@
             </div>
             <input type="file" id="adminBrandingInput" accept="image/jpeg,image/png" style="display:none;" onchange="handleAdminBrandingSelect(event)">
             <label class="admin-modal-label">Do‘kon nomi (Brand Name)</label>
-            <input class="admin-modal-input" id="adminBrandName" placeholder="Masalan: MEDI STORE" maxlength="24">
+            <input class="admin-modal-input" id="adminBrandName" placeholder="Masalan: Bunker Shop" maxlength="24">
             <label class="admin-modal-label">Do‘kon shiori (Brand Subtitle)</label>
             <input class="admin-modal-input" id="adminBrandSub" placeholder="Masalan: Sog'liq uchun professional yechim" maxlength="50">
             
@@ -3049,7 +3049,7 @@
             };
 
             window.applyBranding = function() {
-                const savedName = localStorage.getItem('medi_brand_name') || 'MEDI STORE';
+                const savedName = localStorage.getItem('medi_brand_name') || 'Bunker Shop';
                 const savedLogo = localStorage.getItem('medi_brand_logo');
                 const savedSub = localStorage.getItem('medi_brand_sub') || "Sog'liq uchun professional yechim";
                 
@@ -3069,6 +3069,8 @@
                 if (miniLogo) {
                     if (savedLogo) {
                         miniLogo.innerHTML = `<img src="${savedLogo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+                    } else if (savedName === 'Bunker Shop') {
+                        miniLogo.innerHTML = `<img src="logo.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
                     } else {
                         miniLogo.textContent = savedName.charAt(0).toUpperCase();
                     }
@@ -3083,12 +3085,7 @@
                 if (brandSub) brandSub.textContent = savedSub;
                 
                 // 6. Generate Logo Source
-                let logoSrc = savedLogo;
-                if (!logoSrc) {
-                    const firstLetter = savedName.charAt(0).toUpperCase();
-                    const shortName = savedName.split(' ')[0].toUpperCase().substring(0, 10);
-                    logoSrc = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect fill="#0a1a14" width="120" height="120" rx="30"/><text x="60" y="70" text-anchor="middle" fill="#0d7a5f" font-size="32" font-weight="900">${firstLetter}</text><text x="60" y="95" text-anchor="middle" fill="#1aac88" font-size="12" font-weight="700">${shortName}</text></svg>`)}`;
-                }
+                let logoSrc = savedLogo || 'logo.png';
                 
                 // 7. Update Images
                 const splashImg = document.querySelector('.logo-img-splash');
@@ -3115,7 +3112,7 @@
                 audioManager.play('modalOpen');
                 document.getElementById('adminBrandingModal').classList.add('active');
                 
-                const savedName = localStorage.getItem('medi_brand_name') || 'MEDI STORE';
+                const savedName = localStorage.getItem('medi_brand_name') || 'Bunker Shop';
                 const savedLogo = localStorage.getItem('medi_brand_logo');
                 const savedSub = localStorage.getItem('medi_brand_sub') || "Sog'liq uchun professional yechim";
                 
@@ -3308,7 +3305,7 @@
 
             // ===== DATA =====
             let userBalance = 1000;
-            let userName = 'MEDI User';
+            let userName = 'Bunker User';
             let userBio = "Sog'liq uchun professional yechim";
             let userId = '10000001';
             let avatarData = null;
@@ -3393,7 +3390,7 @@
                 document.getElementById('profileUid').textContent = 'ID: ' + userId;
 
                 if (!localStorage.getItem('medi_username')) {
-                    localStorage.setItem('medi_username', 'MEDI User');
+                    localStorage.setItem('medi_username', 'Bunker User');
                 }
                 userName = localStorage.getItem('medi_username');
                 document.getElementById('profileUsername').textContent = userName;
