@@ -2768,6 +2768,10 @@
             <!-- Admin Settings -->
             <div class="admin-section" id="admin-settings">
                 <div style="display:flex;flex-direction:column;gap:12px;">
+                    <button class="profile-action-btn" onclick="openAdminBrandingModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="margin-right:8px;"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                        Brending sozlamalari
+                    </button>
                     <button class="profile-action-btn" onclick="openAdminSupportModal()">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="margin-right:8px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                         Qo'llab-quvvatlash ma'lumotlari
@@ -2860,6 +2864,34 @@
         </div>
     </div>
 
+    <!-- Admin Branding Settings Modal -->
+    <div class="admin-modal-overlay" id="adminBrandingModal" onclick="if(event.target===this)closeAdminBrandingModal()">
+        <div class="admin-modal-box" onclick="event.stopPropagation()">
+            <button class="admin-close-cross" onclick="closeAdminBrandingModal()">✕</button>
+            <div class="admin-modal-title">Brending sozlamalari</div>
+            <div class="admin-modal-sub">Do‘kon nomi va logotipini boshqarish</div>
+            
+            <label class="admin-modal-label">Logotip (1:1 format)</label>
+            <div class="admin-upload-area" id="adminBrandingUpload" onclick="document.getElementById('adminBrandingInput').click()" style="width:120px;height:120px;margin:0 auto 12px;border-radius:24px;min-height:unset;display:flex;align-items:center;justify-content:center;">
+                <img class="upload-preview" id="adminBrandingPreview" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:24px;" src="" alt="Preview">
+                <div class="upload-overlay" style="border-radius:24px;"><span>O‘zgartirish</span></div>
+                <div id="adminBrandingPlaceholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+                    <div class="upload-icon" style="margin-bottom:4px;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="2"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                    <div class="upload-text" style="font-size:10px;">Logo tanlang</div>
+                </div>
+            </div>
+            <input type="file" id="adminBrandingInput" accept="image/jpeg,image/png" style="display:none;" onchange="handleAdminBrandingSelect(event)">
+            <label class="admin-modal-label">Do‘kon nomi (Brand Name)</label>
+            <input class="admin-modal-input" id="adminBrandName" placeholder="Masalan: MEDI STORE" maxlength="24">
+            
+            <div class="admin-modal-actions" style="margin-top:20px;">
+                <button class="admin-modal-btn success" onclick="saveAdminBranding()">Saqlash</button>
+                <button class="admin-modal-btn danger" onclick="resetAdminBranding()">Dastlabki holatga qaytarish</button>
+                <button class="admin-modal-btn secondary" onclick="closeAdminBrandingModal()">Bekor qilish</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Admin Password Change -->
     <div class="admin-modal-overlay" id="adminPasswordChangeModal" onclick="if(event.target===this)closeAdminPasswordChange()">
         <div class="admin-modal-box" onclick="event.stopPropagation()">
@@ -2942,6 +2974,158 @@
             'use strict';
 
             const DATA_VERSION = '5';
+
+            // ===== BRANDING MANAGEMENT =====
+            let tempBrandingLogo = '';
+
+            window.applyBranding = function() {
+                const savedName = localStorage.getItem('medi_brand_name') || 'MEDI STORE';
+                const savedLogo = localStorage.getItem('medi_brand_logo');
+                
+                // 1. Page Title
+                document.title = savedName;
+                
+                // 2. Splash Brand Text
+                const splashBrand = document.querySelector('.splash-brand');
+                if (splashBrand) splashBrand.textContent = savedName;
+                
+                // 3. Header Brand Name
+                const brandNameHeader = document.querySelector('.brand-name');
+                if (brandNameHeader) brandNameHeader.textContent = savedName;
+                
+                // 4. Header Mini Logo
+                const miniLogo = document.querySelector('.mini-logo');
+                if (miniLogo) {
+                    miniLogo.textContent = savedName.charAt(0).toUpperCase();
+                }
+                
+                // 5. Home Brand Name
+                const brandNameHome = document.querySelector('.brand-name-home');
+                if (brandNameHome) brandNameHome.textContent = savedName;
+                
+                // 6. Generate Logo Source
+                let logoSrc = savedLogo;
+                if (!logoSrc) {
+                    const firstLetter = savedName.charAt(0).toUpperCase();
+                    const shortName = savedName.split(' ')[0].toUpperCase().substring(0, 10);
+                    logoSrc = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect fill="#0a1a14" width="120" height="120" rx="30"/><text x="60" y="70" text-anchor="middle" fill="#0d7a5f" font-size="32" font-weight="900">${firstLetter}</text><text x="60" y="95" text-anchor="middle" fill="#1aac88" font-size="12" font-weight="700">${shortName}</text></svg>`)}`;
+                }
+                
+                // 7. Update Images
+                const splashImg = document.querySelector('.logo-img-splash');
+                if (splashImg) {
+                    splashImg.src = logoSrc;
+                    splashImg.onerror = null;
+                }
+                
+                const homeImg = document.querySelector('.brand-logo img');
+                if (homeImg) {
+                    homeImg.src = logoSrc;
+                    homeImg.onerror = null;
+                }
+                
+                const profileImg = document.getElementById('profileAvatarImg');
+                const savedAvatar = localStorage.getItem('medi_avatar');
+                if (profileImg && !savedAvatar) {
+                    profileImg.src = logoSrc;
+                    profileImg.onerror = null;
+                }
+            };
+
+            window.openAdminBrandingModal = function() {
+                audioManager.play('modalOpen');
+                document.getElementById('adminBrandingModal').classList.add('active');
+                
+                const savedName = localStorage.getItem('medi_brand_name') || 'MEDI STORE';
+                const savedLogo = localStorage.getItem('medi_brand_logo');
+                
+                document.getElementById('adminBrandName').value = savedName;
+                
+                const preview = document.getElementById('adminBrandingPreview');
+                const placeholder = document.getElementById('adminBrandingPlaceholder');
+                
+                if (savedLogo) {
+                    preview.src = savedLogo;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    tempBrandingLogo = savedLogo;
+                } else {
+                    preview.src = '';
+                    preview.style.display = 'none';
+                    placeholder.style.display = 'flex';
+                    tempBrandingLogo = '';
+                }
+            };
+
+            window.closeAdminBrandingModal = function() {
+                audioManager.play('modalClose');
+                document.getElementById('adminBrandingModal').classList.remove('active');
+            };
+
+            window.handleAdminBrandingSelect = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                // Limit to 1MB to prevent QuotaExceededError in localStorage
+                if (file.size > 1024 * 1024) {
+                    showAdminToast("Rasm hajmi 1MB dan oshmasligi kerak!");
+                    audioManager.play('error');
+                    e.target.value = ''; // Reset input
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    tempBrandingLogo = evt.target.result;
+                    const preview = document.getElementById('adminBrandingPreview');
+                    const placeholder = document.getElementById('adminBrandingPlaceholder');
+                    preview.src = tempBrandingLogo;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            };
+
+            window.saveAdminBranding = function() {
+                const name = document.getElementById('adminBrandName').value.trim();
+                if (!name) {
+                    showAdminToast('Iltimos, do\'kon nomini kiriting!');
+                    audioManager.play('error');
+                    return;
+                }
+                
+                try {
+                    localStorage.setItem('medi_brand_name', name);
+                    if (tempBrandingLogo) {
+                        localStorage.setItem('medi_brand_logo', tempBrandingLogo);
+                    } else {
+                        localStorage.removeItem('medi_brand_logo');
+                    }
+                    
+                    applyBranding();
+                    showAdminToast("Sozlamalar saqlandi!");
+                    audioManager.play('success');
+                    closeAdminBrandingModal();
+                } catch (err) {
+                    console.error("Storage error:", err);
+                    showAdminToast("Xatolik: Brauzer xotirasi to'lgan bo'lishi mumkin!");
+                    audioManager.play('error');
+                }
+            };
+
+            window.resetAdminBranding = function() {
+                showConfirmDialog("Brending sozlamalarini dastlabki holatga qaytarishni xohlaysizmi?", function() {
+                    localStorage.removeItem('medi_brand_name');
+                    localStorage.removeItem('medi_brand_logo');
+                    applyBranding();
+                    showAdminToast("Dastlabki holatga qaytarildi!");
+                    audioManager.play('success');
+                    closeAdminBrandingModal();
+                });
+            };
+
+            // Apply immediately on script load
+            applyBranding();
 
             // ===== EXCHANGE RATES (USD asosida) =====
             // Bu kurslar db/serverdan yangilanishi mumkin. Hozircha so'nggi bozor narxlariga yaqin qiymatlar.
